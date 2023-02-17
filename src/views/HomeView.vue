@@ -2,6 +2,7 @@
 import ColTemplate from "../components/ColsTemplate.vue";
 import AddCol from "../components/AddCol.vue";
 import { useColsData } from "../use/useColsData";
+import AddCard from "../components/AddCard.vue";
 
 const { tasks, addCol } = useColsData();
 
@@ -9,20 +10,27 @@ const { tasks, addCol } = useColsData();
 </script>
 
 <template>
-  <header class="header">
-    <h1 class="headerText">Trello</h1>
-  </header>
-  <section class="contentSection">
-    <div v-for="task in tasks" :key="task.id" class="col">
-      <ColTemplate :task="task" />
-    </div>
-    <div class="col">
-      <AddCol />
-    </div>
-  </section>
+  <div class="contianer">
+    <header class="header">
+      <h1 class="headerText">Trello</h1>
+    </header>
+    <section class="contentSection">
+      <div v-for="task in tasks" :key="task.id" class="col">
+        <ColTemplate :task="task" />
+      </div>
+      <div class="col">
+        <AddCol />
+      </div>
+    </section>
+    <AddCard />
+  </div>
 </template>
 
 <style scoped>
+.contianer {
+  position: relative;
+}
+
 .header {
   background-color: beige;
   width: 100vw;

@@ -8,6 +8,14 @@ const props = defineProps({
     type: Object,
   },
 });
+
+const currentDate = new Date();
+
+const timeLeft = () => {
+  const difference = props.card.deadline.getTime() - currentDate.getTime();
+  const totalDays = Math.ceil(difference / (1000 * 3600 * 24));
+  return totalDays;
+};
 </script>
 
 <template>
@@ -19,11 +27,13 @@ const props = defineProps({
         :style="{ backgroundColor: card.label[0].color }"
       ></div>
     </div>
-    <div v-for="user in card.assignUsers" :key="user" class="assigns">
-      {{ user }}
+    <div class="assignsContainer">
+      <div v-for="user in card.assignUsers" :key="user" class="assigns">
+        {{ user }}
+      </div>
     </div>
     <div class="deadline">
-      <p>{{ card.deadline }}</p>
+      <p>{{ timeLeft() }} days</p>
     </div>
     <div v-if="showDescription">
       <div class="description">{{ card.description }}</div>
@@ -55,14 +65,23 @@ const props = defineProps({
   border-radius: 10px;
 }
 
-.assigns {
+.assignsContainer {
   position: absolute;
+  bottom: -15px;
+  left: 10px;
+  display: flex;
+  gap: 3px;
+}
+
+.assigns {
   width: 20px;
   height: 20px;
   background-color: aquamarine;
-  bottom: -15px;
-  left: 10px;
   border-radius: 50%;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .summeryCard {

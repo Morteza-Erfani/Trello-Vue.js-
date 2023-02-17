@@ -23,7 +23,7 @@ const tasks = ref([
             color: "red",
           },
         ],
-        deadline: "2023-4-18",
+        deadline: new Date("2023-4-18"),
       },
     ],
   },
@@ -49,11 +49,13 @@ const tasks = ref([
             color: "maroon",
           },
         ],
-        deadline: "2023-2-28",
+        deadline: new Date("2023-2-28"),
       },
     ],
   },
 ]);
+
+const showAddCard = ref(false);
 
 export function useColsData() {
   const addCol = (title, color) => {
@@ -64,13 +66,14 @@ export function useColsData() {
     });
   };
 
-  const getCards = (id) => {
-    const cards = tasks.value.filter((task) => task.id === id);
-  };
+  // const getCards = (id) => {
+  //   const cards = tasks.value.filter((task) => task.id === id);
+  // };
 
   return {
     tasks,
+    showAddCard,
     addCol,
-    getCards,
+    // getCards,
   };
 }

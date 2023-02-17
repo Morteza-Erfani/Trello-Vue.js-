@@ -1,10 +1,5 @@
 <script setup>
 import CardTemplate from "./CardTemplate.vue";
-import { useColsData } from "../use/useColsData";
-
-// const { tasks, getCards } = useColsData;
-
-// const cards = ref([]);
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
@@ -25,6 +20,7 @@ const props = defineProps({
         <div class="addCard">+</div>
       </div>
     </section>
+
   </div>
 </template>
 

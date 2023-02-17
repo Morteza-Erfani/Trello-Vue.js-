@@ -4,21 +4,24 @@ import { ref } from "vue";
 
 const showAdd = ref(false);
 const addColBg = ref("");
-const colTitle = ref("");
+const colTitleRef = ref(null);
+const colorInputRef = ref(null);
 
 const { addCol } = useColsData();
+
+const addColHandler = () => {
+  addCol(colTitleRef.value.value, colorInputRef.value.value);
+  showAdd.value = false;
+};
 </script>
 
 <template>
-  <div
-    @click="showAdd = !showAdd"
-    class="addColContainer"
-    :style="{ backgroundColor: addColBg }"
-  >
-    <p v-if="!showAdd" class="colPlus">+</p>
+  <div class="addColContainer" :style="{ backgroundColor: addColBg }">
+    <div @click="showAdd = true" v-if="!showAdd" class="addTransparent"></div>
+    <p @click="showAdd = true" v-if="!showAdd" class="colPlus">+</p>
     <div v-if="showAdd" class="addColInput">
       <input
-        v-model="colTitle"
+        ref="colTitleRef"
         class="colTitleInput"
         placeholder="Add Title"
         type="text"
@@ -29,8 +32,12 @@ const { addCol } = useColsData();
         type="color"
         name="colColor"
         id="colColor"
+        ref="colorInputRef"
       />
-      <button class="addColBtn" @click="addCol(colTitle, addColBg)">ADD</button>
+      <div class="buttons">
+        <button class="addColBtn" @click="showAdd = flase">Cancel</button>
+        <button class="addColBtn" @click="addColHandler">ADD</button>
+      </div>
     </div>
   </div>
 </template>
@@ -46,11 +53,22 @@ const { addCol } = useColsData();
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+}
+
+.addTransparent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
 .colPlus {
   font-size: 30px;
   text-align: center;
+  cursor: pointer;
 }
 
 .addColInput {
@@ -84,5 +102,11 @@ const { addCol } = useColsData();
   padding: 5px 0;
   border-radius: 10px;
   border: none;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  gap: 15px;
 }
 </style>
