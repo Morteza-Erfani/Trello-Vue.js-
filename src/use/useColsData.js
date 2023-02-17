@@ -55,6 +55,27 @@ const tasks = ref([
   },
 ]);
 
+const members = ref([
+  {
+    id: 1,
+    name: "Yousef Mohammadiani",
+    role: "Backend Developer",
+    imageURL: "/src/assets/profilePlaceholder.svg",
+  },
+  {
+    id: 2,
+    name: "Mahdi Toosi",
+    role: "Frontend Developer",
+    imageURL: "/src/assets/profilePlaceholder.svg",
+  },
+  {
+    id: 3,
+    name: "Morteza Erfani",
+    role: "Frontend Developer",
+    imageURL: "/src/assets/profilePlaceholder.svg",
+  },
+]);
+
 const showAddCard = ref(false);
 
 export function useColsData() {
@@ -63,6 +84,7 @@ export function useColsData() {
       id: tasks.value.length + 1,
       colTitle: title,
       color: color,
+      cards: [],
     });
   };
 
@@ -73,6 +95,7 @@ export function useColsData() {
   return {
     tasks,
     showAddCard,
+    members,
     addCol,
     // getCards,
   };

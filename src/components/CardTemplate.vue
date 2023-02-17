@@ -23,16 +23,17 @@ const timeLeft = () => {
     <div class="summeryCard">
       <div>{{ card.title }}</div>
       <div
+        v-if="card.label.length"
         class="cardLabel"
         :style="{ backgroundColor: card.label[0].color }"
       ></div>
     </div>
     <div class="assignsContainer">
-      <div v-for="user in card.assignUsers" :key="user" class="assigns">
-        {{ user }}
+      <div v-for="user in card.assignUsers" :key="user.id" class="assigns">
+        <img :src="user.imageURL" />
       </div>
     </div>
-    <div class="deadline">
+    <div v-if="card.deadline" class="deadline">
       <p>{{ timeLeft() }} days</p>
     </div>
     <div v-if="showDescription">
