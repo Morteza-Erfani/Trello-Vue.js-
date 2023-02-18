@@ -3,14 +3,17 @@ import ColTemplate from "../components/ColsTemplate.vue";
 import AddCol from "../components/AddCol.vue";
 import { useColsData } from "../use/useColsData";
 import AddCard from "../components/AddCard.vue";
+import { onMounted } from "vue";
 
-const { tasks, addCol } = useColsData();
+const { tasks, showAddCard, getFromStorage } = useColsData();
 
-// console.log(tasks.value[0].colTitle)
+onMounted(() => {
+  getFromStorage();
+});
 </script>
 
 <template>
-  <div class="contianer">
+  <div class="container">
     <header class="header">
       <h1 class="headerText">Trello</h1>
     </header>
@@ -22,29 +25,39 @@ const { tasks, addCol } = useColsData();
         <AddCol />
       </div>
     </section>
-    <AddCard />
+    <AddCard v-if="showAddCard.isShow" :id="showAddCard.id" />
   </div>
 </template>
 
 <style scoped>
-.contianer {
+.container {
   position: relative;
 }
 
 .header {
-  background-color: beige;
+  background-image: linear-gradient(to bottom, #4c4c47, rgba(45, 45, 42, 0));
   width: 100vw;
   height: 50px;
 }
 
 .headerText {
-  color: maroon;
+  color: #e9e2cf;
   margin-left: 1em;
   font-weight: bold;
+  text-shadow: -1px -1px 0 #2d2d2a;
+  cursor: default;
+  font-family: "Poppins", sans-serif;
 }
 
 .contentSection {
   display: flex;
+  overflow: scroll;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.contentSection::-webkit-scrollbar {
+  display: none;
 }
 
 .col {

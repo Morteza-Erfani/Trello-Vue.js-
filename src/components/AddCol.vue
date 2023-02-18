@@ -35,8 +35,10 @@ const addColHandler = () => {
         ref="colorInputRef"
       />
       <div class="buttons">
-        <button class="addColBtn" @click="showAdd = flase">Cancel</button>
-        <button class="addColBtn" @click="addColHandler">ADD</button>
+        <button class="ColBtn cancelColBtn" @click="showAdd = flase">
+          Cancel
+        </button>
+        <button class="ColBtn addColBtn" @click="addColHandler">ADD</button>
       </div>
     </div>
   </div>
@@ -44,7 +46,7 @@ const addColHandler = () => {
 
 <style scoped>
 .addColContainer {
-  background-color: #f8fff017;
+  background-image: radial-gradient(#78786f, #4c4c47);
   color: black;
   padding: 15px;
   border-radius: 10px;
@@ -54,6 +56,7 @@ const addColHandler = () => {
   justify-content: center;
   align-items: center;
   position: relative;
+  box-shadow: -5px -3px 9px 3px rgba(76, 76, 71, 0.77);
 }
 
 .addTransparent {
@@ -79,6 +82,7 @@ const addColHandler = () => {
   height: 100%;
   width: 100%;
   padding: 45px 0 30px;
+  animation: colInput 0.3s;
 }
 
 .colTitleInput {
@@ -89,6 +93,10 @@ const addColHandler = () => {
   height: 30px;
 }
 
+.colTitleInput:focus {
+  outline: none;
+}
+
 .colColorInput {
   border-radius: 50%;
   padding: 0;
@@ -97,16 +105,34 @@ const addColHandler = () => {
   border: none;
 }
 
-.addColBtn {
+.ColBtn {
   width: 60%;
   padding: 5px 0;
   border-radius: 10px;
   border: none;
+  color: #e5dcc5;
+}
+
+.cancelColBtn {
+  background-color: #c14953;
+}
+
+.addColBtn {
+  background-color: #848fa5;
 }
 
 .buttons {
   display: flex;
   width: 100%;
   gap: 15px;
+}
+
+@keyframes colInput {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 100%;
+  }
 }
 </style>
