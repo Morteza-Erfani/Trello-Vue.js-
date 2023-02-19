@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, ref } from "vue";
+import { ref } from "vue";
 import { useColsData } from "../use/useColsData";
 
 const showDescription = ref(false);
@@ -23,11 +23,17 @@ const timeLeft = () => {
   }
 };
 
-const { saveToStorage } = useColsData();
+const { saveToStorage, editingCard, showAddCard } = useColsData();
 
 const todoHandler = () => {
-  saveToStorage();
-  console.log(props.card.todos);
+  setTimeout(() => {
+    saveToStorage();
+  }, 10);
+};
+
+const editHandler = () => {
+  editingCard.value = props.card;
+  showAddCard.value.isShow = true;
 };
 </script>
 
@@ -35,7 +41,7 @@ const todoHandler = () => {
   <div class="cardContainer">
     <div @click="showDescription = !showDescription" class="summeryCard">
       <div>{{ card.title }}</div>
-      <div v-if="card.label.length" class="labelContainer">
+      <div v-if="card.label.length && !showDescription" class="labelContainer">
         <div
           v-for="(label, index) in card.label"
           :key="index"
@@ -43,7 +49,11 @@ const todoHandler = () => {
           :style="{ backgroundColor: label.color }"
         ></div>
       </div>
+      <div v-if="showDescription" @click.stop="editHandler">
+        <img class="editBtn" src="../assets/edit-button-svgrepo-com.svg" />
+      </div>
     </div>
+    <div />
     <div class="assignsContainer">
       <div v-for="user in card.assignUsers" :key="user.id" class="assigns">
         <img :src="user.imageURL" />
@@ -107,6 +117,11 @@ const todoHandler = () => {
   height: 15px;
   border-radius: 10px;
   margin-left: -5px;
+}
+
+.editBtn {
+  width: 18px;
+  opacity: 0.7;
 }
 
 .assignsContainer {

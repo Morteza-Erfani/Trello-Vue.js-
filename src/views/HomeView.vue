@@ -2,7 +2,7 @@
 import ColTemplate from "../components/ColsTemplate.vue";
 import AddCol from "../components/AddCol.vue";
 import { useColsData } from "../use/useColsData";
-import AddCard from "../components/AddCard.vue";
+import AddEditCard from "../components/AddEditCard.vue";
 import { onMounted } from "vue";
 
 const { tasks, showAddCard, getFromStorage } = useColsData();
@@ -25,7 +25,7 @@ onMounted(() => {
         <AddCol />
       </div>
     </section>
-    <AddCard v-if="showAddCard.isShow" :id="showAddCard.id" />
+    <AddEditCard v-if="showAddCard.isShow" :colId="showAddCard.id" />
   </div>
 </template>
 

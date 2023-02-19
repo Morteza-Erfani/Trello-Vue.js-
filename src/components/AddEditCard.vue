@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useColsData } from "../use/useColsData";
+import moment from "moment";
 
 const titleInputRef = ref(null);
 const descriptionRef = ref(null);
@@ -13,12 +14,20 @@ const todosList = ref([]);
 const assignList = ref([]);
 const showAssignList = ref(false);
 const showTodoList = ref(false);
+const editMode = ref(false);
+const checkedTodo = ref([]);
+const uncheckedTodo = ref([]);
+const changetodo = ref();
+const newTodoRef = ref(null);
+const newTodo = ref("");
+const todoInputRef = ref(null);
+const lableInputRef = ref(null);
 
-const { members, tasks, showAddCard } = useColsData();
+const { members, tasks, showAddCard, editingCard } = useColsData();
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
-  id: {
+  colId: {
     type: String,
   },
 });
@@ -30,6 +39,7 @@ const addTodoHandler = () => {
       isDone: false,
     });
     todoInput.value = null;
+    todoInputRef.value.focus();
   }
 };
 
@@ -67,22 +77,23 @@ const addLabel = () => {
       color: labelColor.value.value,
     });
     labelText.value = "";
+    setTimeout(() => {
+      lableInputRef.value.focus();
+    }, 10);
   }
 };
 
 const isDeadlineSet = () => {
   if (deadlineRef.value.value) {
-    // console.log(new Date(deadlineRef.value.value));
-    // console.log(new Date(deadlineRef.value.value).getTime());
     return new Date(deadlineRef.value.value).getTime();
   } else {
     return false;
   }
 };
 
-const addCard = (id) => {
+const addCard = (colId) => {
   if (titleInputRef.value.value && descriptionRef.value.value) {
-    const index = tasks.value.findIndex((task) => task.id === id);
+    const index = tasks.value.findIndex((task) => task.id === colId);
 
     tasks.value[index].cards.push({
       id: tasks.value[index].cards.length + 1,
@@ -98,11 +109,81 @@ const addCard = (id) => {
 
   localStorage.setItem("tasks", JSON.stringify(tasks.value));
 };
+
+onMounted(() => {
+  editMode.value = Boolean(Object.keys(editingCard.value).length);
+  if (editMode.value) {
+    titleInputRef.value.value = editingCard.value.title;
+    descriptionRef.value.value = editingCard.value.description;
+    assignList.value = editingCard.value.assignUsers;
+    todosList.value = editingCard.value.todos;
+    labels.value = editingCard.value.label;
+    deadlineRef.value.value = moment(editingCard.value.deadline).format(
+      "YYYY-MM-DD"
+    );
+  }
+});
+
+const editAssign = () => {
+  if (editMode.value && assignList.value.length) {
+    return false;
+  } else {
+    return true;
+  }
+};
+const editTodo = () => {
+  if (editMode.value && labels.value.length) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const cancelHandler = () => {
+  (showAddCard.value.isShow = false), (editingCard.value = {});
+};
+
+onMounted(() => {
+  if (editMode.value) {
+    checkedTodo.value = editingCard.value.todos.filter((todo) => todo.isDone);
+    uncheckedTodo.value = editingCard.value.todos.filter(
+      (todo) => !todo.isDone
+    );
+  }
+});
+
+const changeTodoHandler = (index) => {
+  console.log(newTodoRef.value[0]);
+  uncheckedTodo.value[index].name = newTodoRef.value[0].value;
+  changetodo.value = null;
+  newTodoRef.value = null;
+  const findI = todosList.value.findIndex(
+    (todo) => (todo.name = uncheckedTodo.value[index].name)
+  );
+  todosList.value[findI].name = newTodoRef.value[0].value;
+};
+
+const openChangeTodo = (index, name) => {
+  changetodo.value = index;
+  newTodo.value = name;
+  // console.log(newTodoRef.value);
+};
+
+onMounted(() => {
+  titleInputRef.value.focus();
+});
+
+const showTodoHandler = () => {
+  showTodoList.value = true;
+  setTimeout(() => {
+    todoInputRef.value.focus();
+  }, 10);
+};
 </script>
 
 <template>
   <div class="addCardTemplate">
-    <h1 class="title">Add Card</h1>
+    <h1 class="title">{{ editMode ? "Edit Card" : "Add Card" }}</h1>
     <section class="cardDetailSection">
       <div class="leftSection">
         <h3 class="cardTitle">Card Title</h3>
@@ -125,13 +206,13 @@ const addCard = (id) => {
           placeholder="Add Description ..."
         ></textarea>
         <button
-          v-if="!showAssignList"
+          v-if="!showAssignList && editAssign()"
           @click="showAssignList = !showAssignList"
           class="assignBtn"
         >
           Assign
         </button>
-        <div v-if="showAssignList" class="assignContainer">
+        <div v-if="showAssignList || !editAssign()" class="assignContainer">
           <h3 class="assignHeader">Assign</h3>
           <div class="assignList">
             <div
@@ -152,15 +233,52 @@ const addCard = (id) => {
         </div>
         <button
           class="todoBtn"
-          v-if="!showTodoList"
-          @click="showTodoList = true"
+          v-if="!showTodoList && editTodo()"
+          @click="showTodoHandler"
         >
           Create ToDo list
         </button>
-        <div v-if="showTodoList" class="todosContainer">
+        <div v-if="showTodoList || !editTodo()" class="todosContainer">
           <h3 class="todoHeader">Todos</h3>
-          <ul class="todoList">
+          <ul v-if="!editMode" class="todoList">
             <li v-for="(todo, index) in todosList" :key="index">
+              {{ todo.name }}
+            </li>
+          </ul>
+
+          <ul v-if="editMode" class="todoList">
+            <li
+              class="uncheckedTodo"
+              v-for="(todo, index) in uncheckedTodo"
+              :key="index"
+            >
+              <div v-if="changetodo !== index" class="innerUncheckedTodo">
+                <p>{{ todo.name }}</p>
+                <img
+                  class="editBtn"
+                  src="../assets/edit-button-svgrepo-com.svg"
+                  @click="openChangeTodo(index, todo.name)"
+                />
+              </div>
+              <div v-if="changetodo === index" class="cahngeTodoContainer">
+                <input
+                  class="changeTodoInput"
+                  ref="newTodoRef"
+                  type="text"
+                  :value="newTodo"
+                />
+                <img
+                  class="saveTodoChange"
+                  src="../assets/tick-svgrepo-com.svg"
+                  @click="changeTodoHandler(index)"
+                />
+              </div>
+            </li>
+            <li
+              class="checkedTodo"
+              v-for="(todo, index) in checkedTodo"
+              :key="index"
+            >
               {{ todo.name }}
             </li>
           </ul>
@@ -168,6 +286,7 @@ const addCard = (id) => {
             <input
               class="todoInput"
               v-model="todoInput"
+              ref="todoInputRef"
               type="text"
               name="todo"
               id="todo"
@@ -180,7 +299,12 @@ const addCard = (id) => {
       <div class="rightSection">
         <h3 class="labelHeader">Select Label</h3>
         <div class="labelInputContainer">
-          <input class="labelTextInput" type="text" v-model="labelText" />
+          <input
+            class="labelTextInput"
+            type="text"
+            v-model="labelText"
+            ref="lableInputRef"
+          />
           <input
             class="labelColorInput"
             ref="labelColor"
@@ -192,11 +316,16 @@ const addCard = (id) => {
         <button @click="addLabel" class="labelBtn">Add Label</button>
         <h3 class="labelsListHeader" v-if="labels.length">Labels :</h3>
         <div v-for="(label, index) in labels" :key="index" class="labels">
-          <div
-            :style="{ backgroundColor: label.color }"
-            class="labelColor"
-          ></div>
-          <p class="labelText">{{ label.name }}</p>
+          <div class="innerLabels">
+            <div
+              :style="{ backgroundColor: label.color }"
+              class="labelColor"
+            ></div>
+            <p class="labelText">{{ label.name }}</p>
+          </div>
+          <div>
+            <img class="editBtn" src="../assets/edit-button-svgrepo-com.svg" />
+          </div>
         </div>
         <h3 class="deadlineHeader">DeadLine</h3>
         <input
@@ -205,12 +334,16 @@ const addCard = (id) => {
           name="deadline"
           id="deadline"
           class="dateInput"
+          @input="logger"
         />
       </div>
     </section>
     <div class="btnContainer">
-      <button class="addCardBtn" @click="addCard(id)">Add Card</button>
-      <button class="cancelBtn" @click="showAddCard = false">cancel</button>
+      <button v-if="!editMode" class="addCardBtn" @click="addCard(colId)">
+        Add Card
+      </button>
+      <button v-if="editMode" class="addCardBtn">Save</button>
+      <button class="cancelBtn" @click="cancelHandler">cancel</button>
     </div>
   </div>
 </template>
@@ -290,6 +423,7 @@ const addCard = (id) => {
   display: block;
   background-color: #b7b9ba;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .labelsListHeader {
@@ -317,6 +451,7 @@ const addCard = (id) => {
   align-items: center;
   justify-content: center;
   text-align: center;
+  cursor: pointer;
 }
 
 .memberImage {
@@ -354,6 +489,7 @@ textarea {
   color: #4c4c47;
   border: none;
   border-radius: 8px;
+  padding: 3px 10px;
 }
 
 .todoList {
@@ -363,6 +499,49 @@ textarea {
   margin-bottom: 10px;
   padding-left: 25px;
   font-size: 14px;
+}
+
+ul.todoList {
+  padding-left: 20px;
+}
+
+.checkedTodo {
+  text-decoration: line-through;
+}
+
+.uncheckedTodo {
+  width: 55%;
+  gap: 10px;
+  padding: 0 5px;
+}
+
+.uncheckedTodo:hover {
+  background-color: #d6d6d670;
+}
+
+.innerUncheckedTodo {
+  display: flex;
+  justify-content: space-between;
+}
+
+.editBtn {
+  width: 18px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.cahngeTodoContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.changeTodoInput {
+  width: 83%;
+}
+
+.saveTodoChange {
+  width: 15px;
+  opacity: 70%;
 }
 
 .addTodo {
@@ -420,6 +599,19 @@ textarea {
   align-items: center;
   gap: 5px;
   margin-bottom: 3px;
+  justify-content: space-between;
+  width: 65%;
+}
+
+.labels:hover {
+  background-color: #a9a9a968;
+  border-radius: 10px;
+}
+
+.innerLabels {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .labelColor {
@@ -434,6 +626,7 @@ textarea {
 
 .dateInput {
   padding: 0 15px;
+  cursor: pointer;
 }
 
 .btnContainer {

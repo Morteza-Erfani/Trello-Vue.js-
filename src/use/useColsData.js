@@ -81,6 +81,8 @@ const showAddCard = ref({
   id: "",
 });
 
+const editingCard = ref({});
+
 export function useColsData() {
   const addCol = (title, color) => {
     tasks.value.push({
@@ -108,6 +110,7 @@ export function useColsData() {
     tasks,
     showAddCard,
     members,
+    editingCard,
     addCol,
     saveToStorage,
     getFromStorage,
