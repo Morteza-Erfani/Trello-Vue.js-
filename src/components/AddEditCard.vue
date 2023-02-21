@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useColsData } from "../use/useColsData";
 import moment from "moment";
 
@@ -166,6 +166,7 @@ const labelText = ref("");
 const labelColor = ref(null);
 const labels = ref([]);
 const lableInputRef = ref(null);
+const editLabel = ref(false);
 
 const addLabel = () => {
   if (labelText.value && labelColor.value.value) {
@@ -178,6 +179,25 @@ const addLabel = () => {
       lableInputRef.value.focus();
     }, 10);
   }
+};
+
+const editedLabelIndex = ref();
+
+const editLabelHandler = (name, color, index) => {
+  // lableInputRef.value.value = name;
+  labelText.value = name;
+  labelColor.value.value = color;
+  editLabel.value = true;
+  editedLabelIndex.value = index;
+};
+
+const changeLabel = () => {
+  labels.value[editedLabelIndex.value] = {
+    name: labelText.value,
+    color: labelColor.value.value,
+  };
+  labelText.value = "";
+  labelColor.value.value = "";
 };
 
 //  Deadline
@@ -213,6 +233,30 @@ const addCard = (colId) => {
 
 const cancelHandler = () => {
   (showAddCard.value.isShow = false), (editingCard.value = {});
+};
+
+const saveChanges = () => {
+  if (titleInputRef.value.value && descriptionRef.value.value) {
+    const taskIndex = tasks.value.findIndex(
+      (task) => task.id === showAddCard.value.id
+    );
+    const cardIndex = tasks.value[taskIndex].cards.findIndex(
+      (card) => (card.id = editingCard.value.id)
+    );
+
+    tasks.value[taskIndex].cards[cardIndex] = {
+      id: editingCard.value.id,
+      title: titleInputRef.value.value,
+      description: descriptionRef.value.value,
+      assignUsers: assignList.value,
+      todos: uncheckedTodo.value.concat(checkedTodo.value),
+      label: labels.value,
+      deadline: isDeadlineSet(),
+    };
+    showAddCard.value.isShow = false;
+  }
+
+  localStorage.setItem("tasks", JSON.stringify(tasks.value));
 };
 </script>
 
@@ -348,7 +392,12 @@ const cancelHandler = () => {
             id="labelColor"
           />
         </div>
-        <button @click="addLabel" class="labelBtn">Add Label</button>
+        <button v-if="!editLabel" @click="addLabel" class="labelBtn">
+          Add Label
+        </button>
+        <button v-if="editLabel" @click="changeLabel" class="labelBtn">
+          Save Change
+        </button>
         <h3 class="labelsListHeader" v-if="labels.length">Labels :</h3>
         <div v-for="(label, index) in labels" :key="index" class="labels">
           <div class="innerLabels">
@@ -358,8 +407,12 @@ const cancelHandler = () => {
             ></div>
             <p class="labelText">{{ label.name }}</p>
           </div>
-          <div>
-            <img class="editBtn" src="../assets/edit-button-svgrepo-com.svg" />
+          <div v-if="editMode">
+            <img
+              class="editBtn"
+              src="../assets/edit-button-svgrepo-com.svg"
+              @click="editLabelHandler(label.name, label.color, index)"
+            />
           </div>
         </div>
         <h3 class="deadlineHeader">DeadLine</h3>
@@ -377,11 +430,13 @@ const cancelHandler = () => {
       <button v-if="!editMode" class="addCardBtn" @click="addCard(colId)">
         Add Card
       </button>
-      <button v-if="editMode" class="addCardBtn">Save</button>
+      <button v-if="editMode" @click="saveChanges" class="addCardBtn">
+        Save
+      </button>
       <button class="cancelBtn" @click="cancelHandler">cancel</button>
     </div>
   </div>
-  <div @click="showAddCard.isShow = false" class="disableRest" />
+  <div @click="cancelHandler" class="disableRest" />
 </template>
 
 <style scoped>

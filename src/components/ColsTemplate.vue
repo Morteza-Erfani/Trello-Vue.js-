@@ -30,6 +30,7 @@ const showAddCardHandler = (isShow) => {
           :key="card.id"
           :card="card"
           :colColor="task.color"
+          :colId="task.id"
         />
         <div @click="showAddCardHandler(true)" class="addCard">+</div>
       </div>

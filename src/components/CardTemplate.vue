@@ -11,6 +11,9 @@ const props = defineProps({
   colColor: {
     type: String,
   },
+  colId: {
+    type: Number,
+  },
 });
 
 const currentDate = new Date();
@@ -23,7 +26,7 @@ const timeLeft = () => {
   }
 };
 
-const { saveToStorage, editingCard, showAddCard } = useColsData();
+const { saveToStorage, editingCard, showAddCard, tasks } = useColsData();
 
 const todoHandler = () => {
   setTimeout(() => {
@@ -34,6 +37,15 @@ const todoHandler = () => {
 const editHandler = () => {
   editingCard.value = props.card;
   showAddCard.value.isShow = true;
+  showAddCard.value.id = props.colId;
+};
+
+const trashHandler = () => {
+  const index = tasks.value.findIndex((task) => (task.id = props.colId));
+  tasks.value[index].cards = tasks.value[index].cards.filter(
+    (card) => card.id !== props.card.id
+  );
+  saveToStorage();
 };
 </script>
 
@@ -49,8 +61,13 @@ const editHandler = () => {
           :style="{ backgroundColor: label.color }"
         ></div>
       </div>
-      <div v-if="showDescription" @click.stop="editHandler">
-        <img class="editBtn" src="../assets/edit-button-svgrepo-com.svg" />
+      <div v-if="showDescription" class="cardBtnContainer">
+        <div @click="trashHandler">
+          <img class="trashBtn" src="../assets/trash.svg" />
+        </div>
+        <div @click.stop="editHandler">
+          <img class="editBtn" src="../assets/edit-button-svgrepo-com.svg" />
+        </div>
       </div>
     </div>
     <div />
@@ -119,9 +136,20 @@ const editHandler = () => {
   margin-left: -5px;
 }
 
-.editBtn {
+.cardBtnContainer {
+  display: flex;
+  gap: 11px;
+}
+
+.editBtn,
+.trashBtn {
   width: 18px;
   opacity: 0.7;
+}
+
+.editBtn:hover,
+.trashBtn:hover {
+  opacity: 1;
 }
 
 .assignsContainer {
