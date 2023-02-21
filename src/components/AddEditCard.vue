@@ -1,27 +1,10 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useColsData } from "../use/useColsData";
 import moment from "moment";
 
-const titleInputRef = ref(null);
 const descriptionRef = ref(null);
-const labelText = ref("");
-const labelColor = ref(null);
-const labels = ref([]);
-const deadlineRef = ref(null);
-const todoInput = ref("");
-const todosList = ref([]);
-const assignList = ref([]);
-const showAssignList = ref(false);
-const showTodoList = ref(false);
 const editMode = ref(false);
-const checkedTodo = ref([]);
-const uncheckedTodo = ref([]);
-const changetodo = ref();
-const newTodoRef = ref(null);
-const newTodo = ref("");
-const todoInputRef = ref(null);
-const lableInputRef = ref(null);
 
 const { members, tasks, showAddCard, editingCard } = useColsData();
 
@@ -32,16 +15,44 @@ const props = defineProps({
   },
 });
 
-const addTodoHandler = () => {
-  if (todoInput.value) {
-    todosList.value.push({
-      name: todoInput.value,
-      isDone: false,
-    });
-    todoInput.value = null;
-    todoInputRef.value.focus();
+// On Mounted
+onMounted(() => {
+  editMode.value = Boolean(Object.keys(editingCard.value).length);
+  if (editMode.value) {
+    titleInputRef.value.value = editingCard.value.title;
+    descriptionRef.value.value = editingCard.value.description;
+    assignList.value = editingCard.value.assignUsers;
+    todosList.value = editingCard.value.todos;
+    labels.value = editingCard.value.label;
+    deadlineRef.value.value = moment(editingCard.value.deadline).format(
+      "YYYY-MM-DD"
+    );
   }
-};
+});
+
+//  Title On Mounted
+
+const titleInputRef = ref(null);
+
+onMounted(() => {
+  titleInputRef.value.focus();
+});
+
+// Todo On Mounted
+
+onMounted(() => {
+  if (editMode.value) {
+    checkedTodo.value = editingCard.value.todos.filter((todo) => todo.isDone);
+    uncheckedTodo.value = editingCard.value.todos.filter(
+      (todo) => !todo.isDone
+    );
+  }
+});
+
+//  Assign
+
+const assignList = ref([]);
+const showAssignList = ref(false);
 
 const assignHandler = (clickedMember) => {
   if (assignList.value.length) {
@@ -70,6 +81,92 @@ const isAssigned = (id) => {
   }
 };
 
+const editAssign = () => {
+  if (editMode.value && assignList.value.length) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+//  Todo
+
+const todoInput = ref("");
+const todosList = ref([]);
+const todoInputRef = ref(null);
+
+const addTodoHandler = () => {
+  if (todoInput.value) {
+    todosList.value.push({
+      name: todoInput.value,
+      isDone: false,
+    });
+    todoInput.value = null;
+    todoInputRef.value.focus();
+    if (editMode.value) {
+      checkedTodo.value = editingCard.value.todos.filter((todo) => todo.isDone);
+      uncheckedTodo.value = editingCard.value.todos.filter(
+        (todo) => !todo.isDone
+      );
+    }
+  }
+};
+
+const editTodo = () => {
+  if (editMode.value && todosList.value.length) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const newTodoRef = ref(null);
+const newTodo = ref("");
+const checkedTodo = ref([]);
+const uncheckedTodo = ref([]);
+const changetodo = ref();
+
+// const changeTodoHandler = (index) => {
+//   console.log(uncheckedTodo.value[index].name);
+//   console.log(newTodoRef.value[0].value);
+//   uncheckedTodo.value[index].name = newTodoRef.value[0].value;
+//   changetodo.value = null;
+//   newTodoRef.value = null;
+//   const findI = todosList.value.findIndex(
+//     (todo) => (todo.name = uncheckedTodo.value[index].name)
+//   );
+//   console.log(todosList.value);
+//   console.log(findI);
+//   todosList.value[findI].name = newTodoRef.value[0].value;
+// };
+
+const changeTodoHandler = (index) => {
+  uncheckedTodo.value[index].name = newTodoRef.value[0].value;
+  changetodo.value = null;
+  newTodoRef.value = null;
+};
+
+const openChangeTodo = (index, name) => {
+  changetodo.value = index;
+  newTodo.value = name;
+};
+
+const showTodoList = ref(false);
+
+const showTodoHandler = () => {
+  showTodoList.value = true;
+  setTimeout(() => {
+    todoInputRef.value.focus();
+  }, 10);
+};
+
+//  Label
+
+const labelText = ref("");
+const labelColor = ref(null);
+const labels = ref([]);
+const lableInputRef = ref(null);
+
 const addLabel = () => {
   if (labelText.value && labelColor.value.value) {
     labels.value.push({
@@ -82,6 +179,10 @@ const addLabel = () => {
     }, 10);
   }
 };
+
+//  Deadline
+
+const deadlineRef = ref(null);
 
 const isDeadlineSet = () => {
   if (deadlineRef.value.value) {
@@ -110,74 +211,8 @@ const addCard = (colId) => {
   localStorage.setItem("tasks", JSON.stringify(tasks.value));
 };
 
-onMounted(() => {
-  editMode.value = Boolean(Object.keys(editingCard.value).length);
-  if (editMode.value) {
-    titleInputRef.value.value = editingCard.value.title;
-    descriptionRef.value.value = editingCard.value.description;
-    assignList.value = editingCard.value.assignUsers;
-    todosList.value = editingCard.value.todos;
-    labels.value = editingCard.value.label;
-    deadlineRef.value.value = moment(editingCard.value.deadline).format(
-      "YYYY-MM-DD"
-    );
-  }
-});
-
-const editAssign = () => {
-  if (editMode.value && assignList.value.length) {
-    return false;
-  } else {
-    return true;
-  }
-};
-const editTodo = () => {
-  if (editMode.value && labels.value.length) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
 const cancelHandler = () => {
   (showAddCard.value.isShow = false), (editingCard.value = {});
-};
-
-onMounted(() => {
-  if (editMode.value) {
-    checkedTodo.value = editingCard.value.todos.filter((todo) => todo.isDone);
-    uncheckedTodo.value = editingCard.value.todos.filter(
-      (todo) => !todo.isDone
-    );
-  }
-});
-
-const changeTodoHandler = (index) => {
-  console.log(newTodoRef.value[0]);
-  uncheckedTodo.value[index].name = newTodoRef.value[0].value;
-  changetodo.value = null;
-  newTodoRef.value = null;
-  const findI = todosList.value.findIndex(
-    (todo) => (todo.name = uncheckedTodo.value[index].name)
-  );
-  todosList.value[findI].name = newTodoRef.value[0].value;
-};
-
-const openChangeTodo = (index, name) => {
-  changetodo.value = index;
-  newTodo.value = name;
-  // console.log(newTodoRef.value);
-};
-
-onMounted(() => {
-  titleInputRef.value.focus();
-});
-
-const showTodoHandler = () => {
-  showTodoList.value = true;
-  setTimeout(() => {
-    todoInputRef.value.focus();
-  }, 10);
 };
 </script>
 
@@ -346,6 +381,7 @@ const showTodoHandler = () => {
       <button class="cancelBtn" @click="cancelHandler">cancel</button>
     </div>
   </div>
+  <div @click="showAddCard.isShow = false" class="disableRest" />
 </template>
 
 <style scoped>
@@ -362,6 +398,16 @@ const showTodoHandler = () => {
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
   animation: addCard 0.3s;
+}
+
+.disableRest {
+  width: 100%;
+  z-index: 5;
+  background-color: #9e9e9eaf;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  position: absolute;
 }
 
 .title {
@@ -649,6 +695,9 @@ ul.todoList {
 .cancelBtn {
   background-color: #c14953;
   color: #e9e2cf;
+}
+
+.disableRest {
 }
 
 @keyframes assignList {

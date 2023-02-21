@@ -78,7 +78,7 @@ const members = ref([
 
 const showAddCard = ref({
   isShow: false,
-  id: "",
+  id: Number,
 });
 
 const editingCard = ref({});
