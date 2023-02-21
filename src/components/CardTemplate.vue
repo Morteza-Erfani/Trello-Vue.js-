@@ -139,12 +139,18 @@ const trashHandler = () => {
 .cardBtnContainer {
   display: flex;
   gap: 11px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.editBtn,
-.trashBtn {
+.editBtn {
   width: 18px;
   opacity: 0.7;
+}
+
+.trashBtn {
+  width: 15px;
+  opacity: 0.65;
 }
 
 .editBtn:hover,
