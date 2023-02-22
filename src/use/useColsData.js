@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import profile from "../assets/profilePlaceholder.svg";
 
 const tasks = ref([
   // {
@@ -60,19 +61,19 @@ const members = ref([
     id: 1,
     name: "Yousef Mohammadiani",
     role: "Backend Developer",
-    imageURL: "/src/assets/profilePlaceholder.svg",
+    imageURL: profile,
   },
   {
     id: 2,
     name: "Mahdi Toosi",
     role: "Frontend Developer",
-    imageURL: "/src/assets/profilePlaceholder.svg",
+    imageURL: profile,
   },
   {
     id: 3,
     name: "Morteza Erfani",
     role: "Frontend Developer",
-    imageURL: "/src/assets/profilePlaceholder.svg",
+    imageURL: profile,
   },
 ]);
 
