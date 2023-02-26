@@ -661,7 +661,7 @@ ul.todoList {
   font-weight: 600;
   background-color: #b7b9ba;
   border-radius: 50%;
-  width: 26px;
+  min-width: 26px;
   height: 26px;
   text-align: center;
   justify-content: center;
@@ -776,10 +776,20 @@ ul.todoList {
   }
   .cardDetailSection {
     flex-direction: column;
+    overflow-y: scroll;
+    height: 78vh;
+  }
+
+  .cardDetailSection::-webkit-scrollbar {
+    display: none;
   }
 
   .veritcalLine {
     display: none;
+  }
+
+  .btnContainer {
+    margin-top: 15px;
   }
 }
 </style>
