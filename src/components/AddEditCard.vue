@@ -752,9 +752,6 @@ ul.todoList {
   color: #e9e2cf;
 }
 
-.disableRest {
-}
-
 @keyframes assignList {
   from {
     scale: 0;
@@ -770,6 +767,19 @@ ul.todoList {
   }
   to {
     right: 0;
+  }
+}
+
+@media (max-width: 1000px) {
+  .addCardTemplate {
+    width: auto;
+  }
+  .cardDetailSection {
+    flex-direction: column;
+  }
+
+  .veritcalLine {
+    display: none;
   }
 }
 </style>
