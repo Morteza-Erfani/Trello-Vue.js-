@@ -77,7 +77,8 @@ const trashHandler = () => {
       </div>
     </div>
     <div v-if="card.deadline" class="deadline">
-      <p>{{ timeLeft() }} days left</p>
+      <p v-if="timeLeft() >= 0">{{ timeLeft() }} days left</p>
+      <p v-else>Expired</p>
     </div>
     <div class="descriptionContainer" v-if="showDescription">
       <div class="description">{{ card.description }}</div>
